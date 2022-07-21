@@ -1,0 +1,347 @@
+enum {
+  MESSAGE_TYPE_INVALID         = 0x00000000,
+  /* From host to function: */
+  MESSAGE_TYPE_OPEN            = 0x00000001,
+  MESSAGE_TYPE_CLOSE           = 0x00000002,
+  MESSAGE_TYPE_COMMAND         = 0x00000003,
+  MESSAGE_TYPE_HOST_ERROR      = 0x00000004,
+  /* From function to host: */
+  MESSAGE_TYPE_OPEN_DONE       = 0x80000001,
+  MESSAGE_TYPE_CLOSE_DONE      = 0x80000002,
+  MESSAGE_TYPE_COMMAND_DONE    = 0x80000003,
+  MESSAGE_TYPE_FUNCTION_ERROR  = 0x80000004,
+  MESSAGE_TYPE_INDICATE_STATUS = 0x80000007
+};
+
+enum {
+  ERROR_TIMEOUT_FRAGMENT         = 1,
+  ERROR_FRAGMENT_OUT_OF_SEQUENCE = 2,
+  ERROR_LENGTH_MISMATCH          = 3,
+  ERROR_DUPLICATED_TID           = 4,
+  ERROR_NOT_OPENED               = 5,
+  ERROR_UNKNOWN                  = 6,
+  ERROR_CANCEL                   = 7,
+  ERROR_MAX_TRANSFER             = 8
+};
+
+enum {
+  COMMAND_TYPE_UNKNOWN = -1,
+  COMMAND_TYPE_QUERY   = 0,
+  COMMAND_TYPE_SET     = 1
+};
+
+enum {
+  STATUS_SUCCESS                          = 0,
+  STATUS_BUSY                             = 1,
+  STATUS_FAILURE                          = 2,
+  STATUS_SIM_NOT_INSERTED                 = 3,
+  STATUS_BAD_SIM                          = 4,
+  STATUS_PIN_REQUIRED                     = 5,
+  STATUS_PIN_DISABLED                     = 6,
+  STATUS_NOT_REGISTERED                   = 7,
+  STATUS_PROVIDERS_NOT_FOUND              = 8,
+  STATUS_NO_DEVICE_SUPPORT                = 9,
+  STATUS_PROVIDER_NOT_VISIBLE             = 10,
+  STATUS_DATA_CLASS_NOT_AVAILABLE         = 11,
+  STATUS_PACKET_SERVICE_DETACHED          = 12,
+  STATUS_MAX_ACTIVATED_CONTEXTS           = 13,
+  STATUS_NOT_INITIALIZED                  = 14,
+  STATUS_VOICE_CALL_IN_PROGRESS           = 15,
+  STATUS_CONTEXT_NOT_ACTIVATED            = 16,
+  STATUS_SERVICE_NOT_ACTIVATED            = 17,
+  STATUS_INVALID_ACCESS_STRING            = 18,
+  STATUS_INVALID_USER_NAME_PWD            = 19,
+  STATUS_RADIO_POWER_OFF                  = 20,
+  STATUS_INVALID_PARAMETERS               = 21,
+  STATUS_READ_FAILURE                     = 22,
+  STATUS_WRITE_FAILURE                    = 23,
+  STATUS_OPERATION_NOT_ALLOWED            = 28,
+  STATUS_CONTEXT_NOT_SUPPORTED            = 38
+};
+
+enum {
+  DEVICE_TYPE_UNKNOWN   = 0,
+  DEVICE_TYPE_EMBEDDED  = 1,
+  DEVICE_TYPE_REMOVABLE = 2,
+  DEVICE_TYPE_REMOTE    = 3
+};
+
+enum {
+  CELLULAR_CLASS_GSM  = 1 << 0,
+  CELLULAR_CLASS_CDMA = 1 << 1
+};
+
+enum {
+  VOICE_CLASS_UNKNOWN                 = 0,
+  VOICE_CLASS_NO_VOICE                = 1,
+  VOICE_CLASS_SEPARATED_VOICE_DATA    = 2,
+  VOICE_CLASS_SIMULTANEOUS_VOICE_DATA = 3
+};
+
+enum {
+  SIM_CLASS_LOGICAL   = 1 << 0,
+  SIM_CLASS_REMOVABLE = 1 << 1
+};
+
+enum {
+  DATA_CLASS_GPRS        = 1 << 0,
+  DATA_CLASS_EDGE        = 1 << 1,
+  DATA_CLASS_UMTS        = 1 << 2,
+  DATA_CLASS_HSDPA       = 1 << 3,
+  DATA_CLASS_HSUPA       = 1 << 4,
+  DATA_CLASS_LTE         = 1 << 5,
+  /* Bits 6 to 15 reserved for future 3GPP classes */
+  DATA_CLASS_1XRTT       = 1 << 16,
+  DATA_CLASS_1XEVDO      = 1 << 17,
+  DATA_CLASS_1XEVDO_REVA = 1 << 18,
+  DATA_CLASS_1XEVDV      = 1 << 19,
+  DATA_CLASS_3XRTT       = 1 << 20,
+  DATA_CLASS_1XEVDO_REVB = 1 << 21,
+  DATA_CLASS_UMB         = 1 << 22,
+  /* Bits 23 to 30 reserved for future 3GPP2 classes */
+  DATA_CLASS_CUSTOM      = 1 << 31
+};
+
+enum {
+  SMS_CAPS_PDU_RECEIVE  = 1 << 0,
+  SMS_CAPS_PDU_SEND     = 1 << 1,
+  SMS_CAPS_TEXT_RECEIVE = 1 << 2,
+  SMS_CAPS_TEXT_SEND    = 1 << 3
+};
+
+enum {
+  CTRL_CAPS_REG_MANUAL      = 1 << 0,
+  CTRL_CAPS_HW_RADIO_SWITCH = 1 << 1,
+  CTRL_CAPS_CDMA_MOBILE_IP  = 1 << 2,
+  CTRL_CAPS_CDMA_SIMPLE_IP  = 1 << 3,
+  CTRL_CAPS_MULTI_CARRIER   = 1 << 4
+};
+
+enum {
+  SUBSCRIBER_READY_STATE_NOT_INITIALIZED  = 0,
+  SUBSCRIBER_READY_STATE_INITIALIZED      = 1,
+  SUBSCRIBER_READY_STATE_SIM_NOT_INSERTED = 2,
+  SUBSCRIBER_READY_STATE_BAD_SIM          = 3,
+  SUBSCRIBER_READY_STATE_FAILURE          = 4,
+  SUBSCRIBER_READY_STATE_NOT_ACTIVATED    = 5,
+  SUBSCRIBER_READY_STATE_DEVICE_LOCKED    = 6,
+};
+
+enum {
+  READY_INFO_FLAG_PROTECT_UNIQUE_ID = 1 << 0
+};
+
+enum {
+  RADIO_SWITCH_STATE_OFF = 0,
+  RADIO_SWITCH_STATE_ON  = 1
+};
+
+enum {
+  PIN_TYPE_UNKNOWN              = 0,
+  PIN_TYPE_CUSTOM               = 1,
+  PIN_TYPE_PIN1                 = 2,
+  PIN_TYPE_PIN2                 = 3,
+  PIN_TYPE_DEVICE_SIM_PIN       = 4,
+  PIN_TYPE_DEVICE_FIRST_SIM_PIN = 5,
+  PIN_TYPE_NETWORK_PIN          = 6,
+  PIN_TYPE_NETWORK_SUBSET_PIN   = 7,
+  PIN_TYPE_SERVICE_PROVIDER_PIN = 8,
+  PIN_TYPE_CORPORATE_PIN        = 9,
+  PIN_TYPE_SUBSIDY_PIN          = 10,
+  PIN_TYPE_PUK1                 = 11,
+  PIN_TYPE_PUK2                 = 12,
+  PIN_TYPE_DEVICE_FIRST_SIM_PUK = 13,
+  PIN_TYPE_NETWORK_PUK          = 14,
+  PIN_TYPE_NETWORK_SUBSET_PUK   = 15,
+  PIN_TYPE_SERVICE_PROVIDER_PUK = 16,
+  PIN_TYPE_CORPORATE_PUK        = 17
+};
+
+enum {
+  PIN_STATE_UNLOCKED = 0,
+  PIN_STATE_LOCKED   = 1
+};
+
+enum {
+  PIN_OPERATION_ENTER   = 0,
+  PIN_OPERATION_ENABLE  = 1,
+  PIN_OPERATION_DISABLE = 2,
+  PIN_OPERATION_CHANGE  = 3
+};
+
+enum {
+  PIN_MODE_NOT_SUPPORTED = 0,
+  PIN_MODE_ENABLED       = 1,
+  PIN_MODE_DISABLED      = 2
+};
+
+enum {
+  PIN_FORMAT_UNKNOWN      = 0,
+  PIN_FORMAT_NUMERIC      = 1,
+  PIN_FORMAT_ALPHANUMERIC = 2
+};
+
+enum {
+  PROVIDER_STATE_UNKNOWN                = 0,
+  PROVIDER_STATE_HOME                   = 1 << 0,
+  PROVIDER_STATE_FORBIDDEN              = 1 << 1,
+  PROVIDER_STATE_PREFERRED              = 1 << 2,
+  PROVIDER_STATE_VISIBLE                = 1 << 3,
+  PROVIDER_STATE_REGISTERED             = 1 << 4,
+  PROVIDER_STATE_PREFERRED_MULTICARRIER = 1 << 5
+};
+
+enum {
+  VISIBLE_PROVIDERS_ACTION_FULL_SCAN       = 0,
+  VISIBLE_PROVIDERS_ACTION_RESTRICTED_SCAN = 1
+};
+
+enum {
+  NW_ERROR_UNKNOWN                                             = 0,
+  NW_ERROR_IMSI_UNKNOWN_IN_HLR                                 = 2,
+  NW_ERROR_ILLEGAL_MS                                          = 3,
+  NW_ERROR_IMSI_UNKNOWN_IN_VLR                                 = 4,
+  NW_ERROR_IMEI_NOT_ACCEPTED                                   = 5,
+  NW_ERROR_ILLEGAL_ME                                          = 6,
+  NW_ERROR_GPRS_NOT_ALLOWED                                    = 7,
+  NW_ERROR_GPRS_AND_NON_GPRS_NOT_ALLOWED                       = 8,
+  NW_ERROR_MS_IDENTITY_NOT_DERIVED_BY_NETWORK                  = 9,
+  NW_ERROR_IMPLICITLY_DETACHED                                 = 10,
+  NW_ERROR_PLMN_NOT_ALLOWED                                    = 11,
+  NW_ERROR_LOCATION_AREA_NOT_ALLOWED                           = 12,
+  NW_ERROR_ROAMING_NOT_ALLOWED_IN_LOCATION_AREA                = 13,
+  NW_ERROR_GPRS_NOT_ALLOWED_IN_PLMN                            = 14,
+  NW_ERROR_NO_CELLS_IN_LOCATION_AREA                           = 15,
+  NW_ERROR_MSC_TEMPORARILY_NOT_REACHABLE                       = 16,
+  NW_ERROR_NETWORK_FAILURE                                     = 17,
+  NW_ERROR_MAC_FAILURE                                         = 20,
+  NW_ERROR_SYNCH_FAILURE                                       = 21,
+  NW_ERROR_CONGESTION                                          = 22,
+  NW_ERROR_GSM_AUTHENTICATION_UNACCEPTABLE                     = 23,
+  NW_ERROR_NOT_AUTHORIZED_FOR_CSG                              = 25,
+  NW_ERROR_MISSING_OR_UNKNOWN_APN                              = 27,
+  NW_ERROR_SERVICE_OPTION_NOT_SUPPORTED                        = 32,
+  NW_ERROR_REQUESTED_SERVICE_OPTION_NOT_SUBSCRIBED             = 33,
+  NW_ERROR_SERVICE_OPTION_TEMPORARILY_OUT_OF_ORDER             = 34,
+  NW_ERROR_NO_PDP_CONTEXT_ACTIVATED                            = 40,
+  NW_ERROR_SEMANTICALLY_INCORRECT_MESSAGE                      = 95,
+  NW_ERROR_INVALID_MANDATORY_INFORMATION                       = 96,
+  NW_ERROR_MESSAGE_TYPE_NON_EXISTENT_OR_NOT_IMPLEMENTED        = 97,
+  NW_ERROR_MESSAGE_TYPE_NOT_COMPATIBLE_WITH_PROTOCOL_STATE     = 98,
+  NW_ERROR_INFORMATION_ELEMENT_NON_EXISTENT_OR_NOT_IMPLEMENTED = 99,
+  NW_ERROR_CONDITIONAL_IE_ERROR                                = 100,
+  NW_ERROR_MESSAGE_NOT_COMPATIBLE_WITH_PROTOCOL_STATE          = 101,
+  NW_ERROR_PROTOCOL_ERROR_UNSPECIFIED                          = 111
+};
+
+enum {
+  REGISTER_ACTION_AUTOMATIC = 0,
+  REGISTER_ACTION_MANUAL    = 1
+};
+
+enum {
+  REGISTER_STATE_UNKNOWN      = 0,
+  REGISTER_STATE_DEREGISTERED = 1,
+  REGISTER_STATE_SEARCHING    = 2,
+  REGISTER_STATE_HOME         = 3,
+  REGISTER_STATE_ROAMING      = 4,
+  REGISTER_STATE_PARTNER      = 5,
+  REGISTER_STATE_DENIED       = 6
+};
+
+enum {
+  REGISTER_MODE_UNKNOWN   = 0,
+  REGISTER_MODE_AUTOMATIC = 1,
+  REGISTER_MODE_MANUAL    = 2
+};
+
+enum {
+  REGISTRATION_FLAG_NONE                            = 0,
+  REGISTRATION_FLAG_MANUAL_SELECTION_NOT_AVAILABLE  = 1 << 0,
+  REGISTRATION_FLAG_PACKET_SERVICE_AUTOMATIC_ATTACH = 1 << 1,
+};
+
+enum {
+  PACKET_SERVICE_ACTION_ATTACH = 0,
+  PACKET_SERVICE_ACTION_DETACH = 1
+};
+
+enum {
+  PACKET_SERVICE_STATE_UNKNOWN   = 0,
+  PACKET_SERVICE_STATE_ATTACHING = 1,
+  PACKET_SERVICE_STATE_ATTACHED  = 2,
+  PACKET_SERVICE_STATE_DETACHING = 3,
+  PACKET_SERVICE_STATE_DETACHED  = 4
+};
+
+enum {
+  ACTIVATION_COMMAND_DEACTIVATE = 0,
+  ACTIVATION_COMMAND_ACTIVATE   = 1
+};
+
+enum {
+  COMPRESSION_NONE   = 0,
+  COMPRESSION_ENABLE = 1
+};
+
+enum {
+  AUTH_PROTOCOL_NONE     = 0,
+  AUTH_PROTOCOL_PAP      = 1,
+  AUTH_PROTOCOL_CHAP     = 2,
+  AUTH_PROTOCOL_MSCHAPV2 = 3
+};
+
+enum {
+  CONTEXT_IP_TYPE_DEFAULT       = 0,
+  CONTEXT_IP_TYPE_IPV4          = 1,
+  CONTEXT_IP_TYPE_IPV6          = 2,
+  CONTEXT_IP_TYPE_IPV4V6        = 3,
+  CONTEXT_IP_TYPE_IPV4_AND_IPV6 = 4
+};
+
+enum {
+  ACTIVATION_STATE_UNKNOWN      = 0,
+  ACTIVATION_STATE_ACTIVATED    = 1,
+  ACTIVATION_STATE_ACTIVATING   = 2,
+  ACTIVATION_STATE_DEACTIVATED  = 3,
+  ACTIVATION_STATE_DEACTIVATING = 4
+};
+
+enum {
+  VOICE_CALL_STATE_NONE        = 0,
+  VOICE_CALL_STATE_IN_PROGRESS = 1,
+  VOICE_CALL_STATE_HANG_UP     = 2
+};
+
+enum {
+  IP_CONFIG_FLAG_NONE    = 0,
+  IP_CONFIG_FLAG_ADDRESS = 1 << 0,
+  IP_CONFIG_FLAG_GATEWAY = 1 << 1,
+  IP_CONFIG_FLAG_DNS     = 1 << 2,
+  IP_CONFIG_FLAG_MTU     = 1 << 3,
+};
+
+enum {
+  BASIC_CONNECT_DEVICE_CAPS                   = 1,
+  BASIC_CONNECT_SUBSCRIBER_READY_STATUS       = 2,
+  BASIC_CONNECT_RADIO_STATE                   = 3,
+  BASIC_CONNECT_PIN                           = 4,
+  BASIC_CONNECT_PIN_LIST                      = 5,
+  BASIC_CONNECT_HOME_PROVIDER                 = 6,
+  BASIC_CONNECT_PREFERRED_PROVIDERS           = 7,
+  BASIC_CONNECT_VISIBLE_PROVIDERS             = 8,
+  BASIC_CONNECT_REGISTER_STATE                = 9,
+  BASIC_CONNECT_PACKET_SERVICE                = 10,
+  BASIC_CONNECT_SIGNAL_STATE                  = 11,
+  BASIC_CONNECT_CONNECT                       = 12,
+  BASIC_CONNECT_PROVISIONED_CONTEXTS          = 13,
+  BASIC_CONNECT_SERVICE_ACTIVATION            = 14,
+  BASIC_CONNECT_IP_CONFIGURATION              = 15,
+  BASIC_CONNECT_DEVICE_SERVICES               = 16,
+  BASIC_CONNECT_DEVICE_SERVICE_SUBSCRIBE_LIST = 19,
+  BASIC_CONNECT_PACKET_STATISTICS             = 20,
+  BASIC_CONNECT_NETWORK_IDLE_HINT             = 21,
+  BASIC_CONNECT_EMERGENCY_MODE                = 22,
+  BASIC_CONNECT_IP_PACKET_FILTERS             = 23,
+  BASIC_CONNECT_MULTICARRIER_PROVIDERS        = 24
+};
