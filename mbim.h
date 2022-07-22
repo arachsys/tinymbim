@@ -18,6 +18,7 @@ extern struct response_handler {
 } response_handlers[];
 
 void *buffer(int fd);
+void interface(int fd);
 void *receive(int fd, uint32_t type, uint32_t cid);
 void transmit(int fd, const void *msg);
 

@@ -322,6 +322,7 @@ static int response_config(int fd) {
 
   if (size < sizeof(*reply))
     err(EXIT_FAILURE, "Response is truncated");
+  interface(fd);
 
   if (le32toh(reply->ipv4_configuration_available) & IP_CONFIG_FLAG_ADDRESS)
     for (size_t i = 0; i < le32toh(reply->ipv4_address_count); i++)
