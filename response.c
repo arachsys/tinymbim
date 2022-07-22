@@ -44,8 +44,9 @@ static void string(const char *key, const void *buffer, size_t size,
 
   printf("%s ", key);
   for (mbstate_t state = { 0 }; length > 0; in++, length--)
-    if ((count = c16rtomb(out, le16toh(*in), &state)) >= 0)
-      fwrite(out, 1, count, stdout);
+    if ((count = c16rtomb(out, le16toh(*in), &state)) > 0)
+      for (ssize_t i = 0; i < count; i++)
+        putc(out[i] & 224 && out[i] != 127 ? out[i] : 32, stdout);
   putc('\n', stdout);
 }
 
