@@ -1,0 +1,287 @@
+Tinymbim
+========
+
+Tinymbim is a command-line utility to control an MBIM-compatible mobile
+broadband modem on Linux using its cdc-wdm control device.
+
+The MBIM protocol is insanely overengineered, with a specification running
+to 230 pages, but this tool supports a simple subset sufficient to bring up
+a mobile internet connection.
+
+
+Demonstration
+-------------
+
+Using a Quectel EP06-E 4G/LTE broadband modem configured in MBIM mode, with
+the kernel drivers enabled (as discussed below) and a Vodafone UK SIM:
+
+  # ls -l /dev/cdc-wdm0
+  crw------- 1 root root 180, 176 Jul 23 11:38 /dev/cdc-wdm0
+
+  # mbim /dev/cdc-wdm0 open
+  # mbim /dev/cdc-wdm0 subscriber
+  ready-state initialized
+  sim-icc-id nnnnnnnnnnnnnnnnnnnn
+  subscriber-id nnnnnnnnnnnnnnn
+
+  # mbim /dev/cdc-wdm0 connect internet
+  session-id 0
+  activation-state activated
+  ip-type ipv4
+
+  # mbim /dev/cdc-wdm0 config
+  interface wwan0
+  address 10.25.152.131/29
+  gateway 10.25.152.132
+  dns 10.206.128.1
+  dns 10.206.128.1
+  mtu 1500
+
+Configuring and testing the interface:
+
+  # ip address add 10.25.152.131/29 dev wwan0
+  # ip link set wwan0 up
+  # ip route add default via 10.25.152.132
+  # ping 8.8.8.8
+  PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+  64 bytes from 8.8.8.8: icmp_seq=1 ttl=115 time=55.9 ms
+  64 bytes from 8.8.8.8: icmp_seq=2 ttl=115 time=57.7 ms
+  [...]
+
+Closing the session:
+
+  # ip link set wwan down
+  # ip address flush dev wwan0
+  # mbim /dev/cdc-wdm0 close
+
+
+Usage
+-----
+
+The mbim utility is invoked as
+
+  mbim DEVICE CMD [ARG]...
+
+where DEVICE is the path to the cdc-wdm control device and CMD is one of the
+commands below. There are no flags or options. Run with no arguments or an
+unknown command, it summarises supported commands to standard error.
+
+All commands that generate output do so in key-value lines as seen in the
+demonstration above. Each key consists of lower-case letters and hyphens,
+i.e. /[a-z-]+/, followed by a space, then the field value.
+
+Integer values are always decimal. Strings are unquoted but scrubbed of
+newlines, NULs and other control characters, making the format safe and
+unambiguous for a shell read loop. Enum values contain a single keyword of
+the form /[a-z0-9-]+/, and mask values are a list of zero or more such
+keywords joined with spaces.
+
+
+Device open and close
+---------------------
+
+Before interacting with a device, it must be initialised with 'mbim open'.
+This command succeeds silently, or fails with an error if the modem is not
+configured to speak MBIM, the kernel does not have CONFIG_USB_NET_CDC_MBIM
+support, or the wrong device is specified.
+
+Conversely, 'mbim close' shuts down an open device. It is not necessary to
+disconnect or detach before closing.
+
+
+Device capabilities
+-------------------
+
+List the capabilities of the device with 'mbim caps', including cellular
+technology, available data classes, hardware model and firmware version.
+For example:
+
+  # mbim /dev/cdc-wdm0 caps
+  device-type remote
+  cellular-class gsm
+  voice-class none
+  sim-class removable
+  data-class umts hsdpa hsupa lte
+  sms-caps pdu-receive pdu-send
+  control-caps reg-manual
+  max-sessions 8
+  device-id nnnnnnnnnnnnnnn
+  firmware-info EP06ELAR03A08M4G
+  hardware-info EP06-E
+
+
+Subscriber ready-state
+----------------------
+
+'mbim subscriber' queries the ready-state, which will be 'initialized' if
+the SIM is inserted, unlocked and initialised. It seems to be necessary to
+run this command after opening the device, or 'mbim connect' will fail.
+
+
+Radio power state
+-----------------
+
+Read or set the radio power state with 'mbim radio'. Run without arguments,
+it lists the hardware and software radio switch state. Run with an argument
+of '0' or 'off', it turns off the software radio switch. With any other
+argument, such as '1' or 'on', it turns on the software radio switch.
+
+
+PIN status
+----------
+
+'mbim pin' queries the PIN status if no argument is given, or enters a PIN
+to unlock the SIM if one is supplied as an argument.
+
+
+Home provider
+-------------
+
+Find the subscriber's home provider using 'mbim home'. For example:
+
+  # mbim /dev/cdc-wdm0 home
+  provider-id 23415
+  provider-name vodafone UK
+  provider-state home
+  cellular-class gsm
+  rssi 99
+  error-rate 99
+
+
+Registration
+------------
+
+Without an argument, 'mbim register' reads the current device registration
+state, including the current provider, cellular and data classes, and
+whether automatic selection is enabled.
+
+Run as 'mbim register auto', it configures the device to select the best
+provider network automatically. Run with a provider ID as an argument, it
+manually registers with the specified provider network.
+
+
+Attach and detach
+-----------------
+
+Attach or detach from the provider's packet service using 'mbim attach' or
+'mbim detach'. These return nominal uplink and downlink speeds on success.
+Apparently 'mbim attach' is not required before 'mbim connect'.
+
+
+Connect and disconnect
+----------------------
+
+'mbim connect APN' brings up an IP connection using the access string APN.
+The device selects a default address family but prefixing APN with 'ipv4:',
+'ipv6:' or 'ipv4v6:' will override its choice..
+
+If authentication is required, three extra parameters can be given: the
+method (pap, chap or mschapv2), username and password. For example:
+
+  # mbim /dev/cdc-wdm0 connect ipv4:internet chap web web
+  session-id 0
+  activation-state activated
+  ip-type ipv4
+
+Disconnect using 'mbim disconnect'. This is required before reconnecting
+with a different APN, IP family or authentication details.
+
+
+IP configuration
+----------------
+
+Once an IP connection is successfully established, read the configuration to
+apply to the host-side network interface with 'mbim config'. For example:
+
+  # mbim /dev/cdc-wdm0 config
+  interface wwan0
+  address 10.25.152.131/29
+  gateway 10.25.152.132
+  dns 10.206.128.1
+  dns 10.206.128.1
+  mtu 1500
+
+The interface key is deduced from sysfs, and is the network interface name
+corresponding to the given cdc-wdm device. It always appears before other
+keys to simplify scripts consuming the key-value output lines.
+
+The address, gateway and dns keys may be repeated to supply multiple IPv4 or
+IPv6 addresses, and the netmask is included in the case of the address key.
+Exactly one address is supplied per key.
+
+
+Bringing up a network connection
+--------------------------------
+
+The minimal sequence of operations needed to bring up an internet connection
+appears to be 'mbim open', 'mbim subscriber' then 'mbim connect'. (Without
+the 'mbim subscriber' query, 'mbim connect' fails on my EP06-E modem.)
+
+The wwan interface can then be configured from the output of 'mbim config'
+using 'ip address add' and 'ip link set up'.
+
+To shut down a connection, flush addresses with 'ip address flush', take the
+link down with 'ip link set down', then call 'mbim close'.
+
+
+Differences from umbim and libmbim/mbimcli
+------------------------------------------
+
+Libmbim and mbimcli have broad support for MBIM features including firmware
+update, concurrent sessions, phonebook and device service stream; umbim and
+tinymbim focus on just the 'basic connect' interface needed to bring up a
+network connection.
+
+Tinymbim exposes explicit device open and close commands, whereas libmbim
+and umbim implicitly open and close depending on the --no-open=TID and
+--no-close options to mbimcli, or the -n and -t TID options to umbim.
+
+Because open and close are distinct commands, tinymbim sends exactly one
+message per invocation. This allows tinymbim to use its PID as a reliably
+unique transaction ID, sparing users the noise of managing TIDs manually.
+
+Modems are complex devices, usually running hard-to-audit proprietary
+software. They are best treated as an untrusted part of the network and a
+potential adversary. Tinymbim rigorously validates every offset and length
+within response packets to avoid dereferencing out-of-bounds memory, scrubs
+control characters from strings, and rejects invalid unicode strings.
+
+Tinymbim does not link against external libraries or require heavyweight
+build infrastructure; umbim depends on libubox and builds with cmake;
+libmbim depends on glib and builds with meson, pkgconfig and python.
+
+
+Building and installing
+-----------------------
+
+Unpack the source tar.gz file and change to the unpacked directory.
+
+Run 'make' then 'make install' to install the mbim utility in /bin.
+Alternatively, you can set DESTDIR and/or BINDIR to install in a different
+location, or strip and copy the compiled binary into the correct place
+manually.
+
+Tinymbim assumes a Linux-specific cdc-wdm device interface, but otherwise
+should build and work out of the box on reasonably recent musl/glibc and
+clang/gcc.
+
+Your kernel will need CONFIG_USB_WDM and CONFIG_USB_NET_CDC_MBIM to support
+MBIM modems, which by default appear as a character device /dev/cdc-wdm0
+plus a network interface wwan0.
+
+Some modems must be manually reconfigured to present as MBIM devices. For
+example, my Quectel EP06-E needed AT+QCFG="usbnet",2 to switch into MBIM
+mode, although this setting then persists across power-cycles.
+
+Please report any problems or bugs to Chris Webb <chris@arachsys.com>.
+
+
+Copying
+-------
+
+Tinymbim is based on OpenWrt umbim by John Crispin <blogic@openwrt.org>,
+although Chris Webb <chris@arachsys.com> is now to blame for any bugs as
+the user interface and internal structure have been heavily modified.
+
+This software is distributed under the terms of the GNU GPL version 2, as
+included in GPLV2.
