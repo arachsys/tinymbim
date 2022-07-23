@@ -211,6 +211,40 @@ static int response_home(int fd) {
   return EXIT_SUCCESS;
 }
 
+static int response_visible(int fd) {
+  struct command_done_message *msg = receive(fd, MESSAGE_TYPE_COMMAND_DONE,
+    BASIC_CONNECT_VISIBLE_PROVIDERS);
+  struct basic_connect_visible_providers_r *reply = (void *) msg->buffer;
+  size_t size = le32toh(msg->buffer_length);
+
+  if (size < sizeof(*reply) || size < sizeof(*reply)
+        + le32toh(reply->providers_count) * sizeof(struct reference))
+    err(EXIT_FAILURE, "Response is truncated");
+
+  for (size_t i = 0; i < le32toh(reply->providers_count); i++) {
+    size_t offset = le32toh(reply->providers[i].offset);
+    size_t length = le32toh(reply->providers[i].length);
+    struct provider *provider = (void *) ((char *) reply + offset);
+
+    if (size < offset + length)
+      err(EXIT_FAILURE, "Response is truncated");
+    if (i > 0)
+      putc('\n', stdout);
+
+    string("provider-id", provider, length, &provider->provider_id);
+    string("provider-name", provider, length, &provider->provider_name);
+    mask32("provider-state", provider->provider_state, provider_state_values);
+    mask32("cellular-class", provider->cellular_class, cellular_class_values);
+    if (le32toh(provider->rssi) < 32)
+      printf("rssi %d\n", 2 * le32toh(provider->rssi) - 113);
+    if (le32toh(provider->error_rate) < 8)
+      printf("error-rate %d\n", provider->error_rate);
+  }
+
+  free(msg);
+  return EXIT_SUCCESS;
+}
+
 static int response_register(int fd) {
   struct command_done_message *msg = receive(fd, MESSAGE_TYPE_COMMAND_DONE,
     BASIC_CONNECT_REGISTER_STATE);
@@ -224,10 +258,8 @@ static int response_register(int fd) {
 
   if (reply->nw_error)
     enum32("network-error", reply->nw_error, nw_error_values);
-  enum32("register-state", reply->register_state,
-    register_state_values);
-  enum32("register-mode", reply->register_mode,
-    register_mode_values);
+  enum32("register-state", reply->register_state, register_state_values);
+  enum32("register-mode", reply->register_mode, register_mode_values);
   mask32("available-data-classes", reply->available_data_classes,
     data_class_values);
   mask32("current-cellular-class", reply->current_cellular_class,
@@ -383,6 +415,7 @@ struct response_handler response_handlers[] = {
   { "radio", response_radio },
   { "pin", response_pin },
   { "home", response_home },
+  { "visible", response_visible },
   { "register", response_register },
   { "attach", response_attach },
   { "detach", response_detach },

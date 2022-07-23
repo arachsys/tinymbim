@@ -146,6 +146,17 @@ static void request_home(int fd, int argc, char **argv) {
   free(cmd);
 }
 
+static void request_visible(int fd, int argc, char **argv) {
+  struct command_message *cmd = buffer(fd);
+
+  begin(cmd, basic_connect, COMMAND_TYPE_QUERY,
+    BASIC_CONNECT_VISIBLE_PROVIDERS,
+    sizeof(struct basic_connect_visible_providers_q));
+  finish(cmd);
+  transmit(fd, cmd);
+  free(cmd);
+}
+
 static void request_register(int fd, int argc, char **argv) {
   struct command_message *cmd = buffer(fd);
 
@@ -274,6 +285,7 @@ struct request_handler request_handlers[] = {
   { "radio", request_radio },
   { "pin", request_pin },
   { "home", request_home },
+  { "visible", request_visible },
   { "register", request_register },
   { "attach", request_attach },
   { "detach", request_detach },

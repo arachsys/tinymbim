@@ -38,6 +38,7 @@ Commands:\n\
   radio [on|off]\n\
   pin [PIN]\n\
   home\n\
+  visible\n\
   register\n\
   attach\n\
   detach\n\

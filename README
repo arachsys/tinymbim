@@ -146,6 +146,29 @@ Find the subscriber's home provider using 'mbim home'. For example:
   cellular-class gsm
 
 
+Visible providers
+-----------------
+
+List all providers within range using 'mbim visible'. For example:
+
+  # mbim /dev/cdc-wdm0 visible
+  provider-id 23415
+  provider-name vodafone UK
+  provider-state home preferred visible registered
+  cellular-class gsm
+
+  provider-id 23430
+  provider-name EE
+  provider-state forbidden visible
+  cellular-class gsm
+
+The provider-id values can be used when manually selecting a provider
+with 'mbim register'.
+
+This command can take some time to complete, and it may fail with a 'Device
+is busy' error if there is an active IP connection.
+
+
 Registration
 ------------
 
