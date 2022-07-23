@@ -41,6 +41,7 @@ Commands:\n\
   register\n\
   attach\n\
   detach\n\
+  signal\n\
   connect APN [AUTH USER PASS]\n\
   disconnect\n\
   config\n\

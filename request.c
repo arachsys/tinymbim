@@ -190,6 +190,16 @@ static void request_detach(int fd, int argc, char **argv) {
   free(cmd);
 }
 
+static void request_signal(int fd, int argc, char **argv) {
+  struct command_message *cmd = buffer(fd);
+
+  begin(cmd, basic_connect, COMMAND_TYPE_QUERY,
+    BASIC_CONNECT_SIGNAL_STATE, 0);
+  finish(cmd);
+  transmit(fd, cmd);
+  free(cmd);
+}
+
 static void request_connect(int fd, int argc, char **argv) {
   struct command_message *cmd = buffer(fd);
   struct basic_connect_connect_s *connect = begin(cmd, basic_connect,
@@ -267,6 +277,7 @@ struct request_handler request_handlers[] = {
   { "register", request_register },
   { "attach", request_attach },
   { "detach", request_detach },
+  { "signal", request_signal },
   { "connect", request_connect },
   { "disconnect", request_disconnect },
   { "config", request_config },

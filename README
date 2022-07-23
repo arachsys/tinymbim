@@ -144,8 +144,6 @@ Find the subscriber's home provider using 'mbim home'. For example:
   provider-name vodafone UK
   provider-state home
   cellular-class gsm
-  rssi 99
-  error-rate 99
 
 
 Registration
@@ -166,6 +164,15 @@ Attach and detach
 Attach or detach from the provider's packet service using 'mbim attach' or
 'mbim detach'. These return nominal uplink and downlink speeds on success.
 Apparently 'mbim attach' is not required before 'mbim connect'.
+
+
+Signal strength
+---------------
+
+Check the signal strength and error rate with 'mbim signal'. This returns
+two keys: rssi is the signal strength in dBm and error-rate runs from 0 if
+the bit error rate < 0.2% to 7 if the bit error rate > 12.8%. If either
+value is unknown, it is omitted entirely from the output.
 
 
 Connect and disconnect

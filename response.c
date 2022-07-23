@@ -202,8 +202,10 @@ static int response_home(int fd) {
     provider_state_values);
   mask32("cellular-class", reply->provider.cellular_class,
     cellular_class_values);
-  enum32("rssi", reply->provider.rssi, NULL);
-  enum32("error-rate", reply->provider.error_rate, NULL);
+  if (le32toh(reply->provider.rssi) < 32)
+    printf("rssi %d\n", 2 * le32toh(reply->provider.rssi) - 113);
+  if (le32toh(reply->provider.error_rate) < 8)
+    printf("error-rate %d\n", reply->provider.error_rate);
 
   free(msg);
   return EXIT_SUCCESS;
@@ -275,6 +277,23 @@ static int response_detach(int fd) {
   if (handle_attach(fd) == PACKET_SERVICE_STATE_DETACHED)
     return EXIT_SUCCESS;
   return EXIT_FAILURE;
+}
+
+static int response_signal(int fd) {
+  struct command_done_message *msg = receive(fd, MESSAGE_TYPE_COMMAND_DONE,
+    BASIC_CONNECT_SIGNAL_STATE);
+  struct basic_connect_signal_state_r *reply = (void *) msg->buffer;
+
+  if (le32toh(msg->buffer_length) < sizeof(*reply))
+    err(EXIT_FAILURE, "Response is truncated");
+
+  if (le32toh(reply->rssi) < 32)
+    printf("rssi %d\n", 2 * le32toh(reply->rssi) - 113);
+  if (le32toh(reply->error_rate) < 8)
+    printf("error-rate %d\n", reply->error_rate);
+
+  free(msg);
+  return EXIT_SUCCESS;
 }
 
 static uint32_t handle_connect(int fd) {
@@ -367,6 +386,7 @@ struct response_handler response_handlers[] = {
   { "register", response_register },
   { "attach", response_attach },
   { "detach", response_detach },
+  { "signal", response_signal },
   { "connect", response_connect },
   { "disconnect", response_disconnect },
   { "config", response_config },
