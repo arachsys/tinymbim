@@ -149,10 +149,15 @@ static void request_home(int fd, int argc, char **argv) {
 static void request_register(int fd, int argc, char **argv) {
   struct command_message *cmd = buffer(fd);
 
-  if (argc == 1 && strcmp(argv[0], "auto") == 0) {
+  if (argc > 0) {
     struct basic_connect_register_state_s *state = begin(cmd, basic_connect,
       COMMAND_TYPE_SET, BASIC_CONNECT_REGISTER_STATE, sizeof(*state));
-    state->register_action = htole32(REGISTER_ACTION_AUTOMATIC);
+    if (strcmp(argv[0], "auto") == 0) {
+      state->register_action = htole32(REGISTER_ACTION_AUTOMATIC);
+    } else {
+      state->register_action = htole32(REGISTER_ACTION_MANUAL);
+      string(cmd, &state->provider_id, argv[0]);
+    }
   } else {
     begin(cmd, basic_connect, COMMAND_TYPE_QUERY,
       BASIC_CONNECT_REGISTER_STATE, 0);
