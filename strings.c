@@ -264,7 +264,8 @@ struct map function_error_messages[] = {
   { ERROR_NOT_OPENED, "Device must be opened first" },
   { ERROR_UNKNOWN, "Unknown device error" },
   { ERROR_CANCEL, "Cancel pending transactions" },
-  { ERROR_MAX_TRANSFER, "Invalid maximum transfer size" }
+  { ERROR_MAX_TRANSFER, "Invalid maximum transfer size" },
+  { 0, NULL }
 };
 
 struct map command_error_messages[] = {
@@ -292,5 +293,6 @@ struct map command_error_messages[] = {
   { STATUS_READ_FAILURE, "Failed to read data" },
   { STATUS_WRITE_FAILURE, "Failed to write data" },
   { STATUS_OPERATION_NOT_ALLOWED, "Operation is not allowed" },
-  { STATUS_CONTEXT_NOT_SUPPORTED, "Context is not supported" }
+  { STATUS_CONTEXT_NOT_SUPPORTED, "Context is not supported" },
+  { 0, NULL }
 };
