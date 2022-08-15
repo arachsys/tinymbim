@@ -2,11 +2,13 @@
 #include <endian.h>
 #include <err.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 
 #include <linux/usb/cdc-wdm.h>
+#include <sys/file.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/sysmacros.h>
@@ -25,6 +27,16 @@ void *buffer(int fd) {
   header->length = htole32(size);
   header->transaction_id = getpid();
   return header;
+}
+
+int device(const char *path) {
+  int fd = open(path, O_RDWR);
+
+  if (fd < 0)
+    err(EXIT_FAILURE, "open");
+  if (flock(fd, LOCK_EX) < 0)
+    err(EXIT_FAILURE, "flock");
+  return fd;
 }
 
 void interface(int fd) {

@@ -1,5 +1,3 @@
-#include <err.h>
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,9 +18,7 @@ int main(int argc, char **argv) {
         response = response_handlers[i].handler;
 
     if (request && response) {
-      int fd = open(argv[1], O_RDWR);
-      if (fd < 0)
-        err(EXIT_FAILURE, "open");
+      int fd = device(argv[1]);
       request(fd, argc - 3, argv + 3);
       return response(fd);
     }
