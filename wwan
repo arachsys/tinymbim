@@ -1,0 +1,41 @@
+#!/bin/sh -e
+
+case "$2" in
+  start)
+    mbim "$1" open
+    mbim "$1" subscriber >/dev/null
+    mbim "$1" connect internet >/dev/null
+    mbim "$1" config | while read -r KEY VALUE; do
+      case "$KEY" in
+        interface)
+          IF=$VALUE && ip address flush "$IF" && ip link set "$IF" up
+          ;;
+        address)
+          [ -n "$IF" ] && ip address add "$VALUE" dev "$IF"
+          ;;
+        gateway)
+          [ -n "$IF" ] && ip route add default via "$VALUE"
+          ;;
+        mtu)
+          [ -n "$IF" ] && ip link set "$IF" mtu "$VALUE"
+          ;;
+      esac
+    done
+    ;;
+
+  stop)
+    mbim "$1" config 2>/dev/null | while read -r KEY VALUE; do
+      case "$KEY" in
+        interface)
+          ip address flush "$VALUE" && ip link set "$VALUE" down
+          ;;
+      esac
+    done
+    mbim "$1" close
+    ;;
+
+  *)
+    echo "Usage: $(basename "$0") DEVICE start|stop" >&2
+    exit 64
+    ;;
+esac

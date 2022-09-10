@@ -253,6 +253,8 @@ using 'ip address add' and 'ip link set up'.
 To shut down a connection, flush addresses with 'ip address flush', take the
 link down with 'ip link set down', then call 'mbim close'.
 
+These steps are automated by the included wwan demonstration script.
+
 
 Differences from umbim and libmbim/mbimcli
 ------------------------------------------
