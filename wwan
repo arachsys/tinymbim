@@ -4,7 +4,7 @@ case "$2" in
   start)
     mbim "$1" open
     mbim "$1" subscriber >/dev/null
-    mbim "$1" connect internet >/dev/null
+    mbim "$1" connect "${3:-internet}" "${@:4}" >/dev/null
     mbim "$1" config | while read -r KEY VALUE; do
       case "$KEY" in
         interface)
