@@ -2,7 +2,7 @@ Tinymbim
 ========
 
 Tinymbim is a command-line utility to control an MBIM-compatible mobile
-broadband modem on Linux using its cdc-wdm control device.
+broadband modem on Linux using its cdc-wdm or wwan control device.
 
 The MBIM protocol is insanely overengineered, with a specification running
 to 230 pages, but this tool supports a simple subset sufficient to bring up
@@ -62,9 +62,9 @@ The mbim utility is invoked as
 
   mbim DEVICE CMD [ARG]...
 
-where DEVICE is the path to the cdc-wdm control device and CMD is one of the
-commands below. There are no flags or options. Run with no arguments or an
-unknown command, it summarises supported commands to standard error.
+where DEVICE is the path to a cdc-wdm or wwan control device and CMD is one
+of the commands below. There are no flags or options. Run with no arguments
+or an unknown command, it summarises supported commands to standard error.
 
 All commands that generate output do so in key-value lines as seen in the
 demonstration above. Each key consists of lower-case letters and hyphens,
