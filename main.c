@@ -32,7 +32,7 @@ Commands:\n\
   caps              query device capabilities\n\
   subscriber        query subscriber ready-state\n\
   radio [on|off]    query or control radio power\n\
-  pin [PIN]         query PIN status or unlock with PIN\n\
+  pin [[TYPE] PIN]  query PIN status or unlock with PIN\n\
   home              query home provider details\n\
   visible           scan for visible providers\n\
   register [auto|PROVIDER]\n\

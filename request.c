@@ -123,9 +123,19 @@ static void request_pin(int fd, int argc, char **argv) {
   if (argc > 0) {
     struct basic_connect_pin_s *pin = begin(cmd, basic_connect,
         COMMAND_TYPE_SET, BASIC_CONNECT_PIN, sizeof(*pin));
-    pin->pin_type = htole32(PIN_TYPE_PIN1);
     pin->pin_operation = htole32(PIN_OPERATION_ENTER);
-    string(cmd, &pin->pin, argv[0]);
+    if (argc > 1) {
+      struct map *pin_type = pin_type_values;
+      while (pin_type->value && strcmp(argv[0], pin_type->value))
+        pin_type++;
+      if (pin_type->value == NULL)
+        errx(EXIT_FAILURE, "Invalid PIN type: %s", argv[0]);
+      pin->pin_type = htole32(pin_type->key);
+      string(cmd, &pin->pin, argv[1]);
+    } else {
+      pin->pin_type = htole32(PIN_TYPE_PIN1);
+      string(cmd, &pin->pin, argv[0]);
+    }
   } else {
     begin(cmd, basic_connect, COMMAND_TYPE_QUERY,
       BASIC_CONNECT_PIN, 0);
