@@ -255,6 +255,13 @@ link down with 'ip link set down', then call 'mbim close'.
 
 These steps are automated by the included wwan demonstration script.
 
+4G/LTE carriers supporting IPv6 typically delegate a single /64 which a
+router might want to advertise to a local network. A simple way to achieve
+this is to move the assigned global address from the wwan interface to the
+lan interface, enable IPv6 forwarding and router advertisements, and leave
+the wwan link-local address and default route untouched. See section 4.2 of
+RFC 7278 for more details.
+
 
 Differences from umbim and libmbim/mbimcli
 ------------------------------------------
