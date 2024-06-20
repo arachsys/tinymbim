@@ -1,6 +1,5 @@
 #include <endian.h>
 #include <err.h>
-#include <poll.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -92,13 +91,8 @@ static int response_open(int fd) {
 }
 
 static int response_close(int fd) {
-  struct close_done_message *msg;
-  struct pollfd pfd = { .fd = fd, .events = POLLIN };
+  struct close_done_message *msg = receive(fd, MESSAGE_TYPE_CLOSE_DONE, -1);
 
-  if (poll(&pfd, 1, 1000) <= 0)
-    return EXIT_FAILURE;
-
-  msg = receive(fd, MESSAGE_TYPE_CLOSE_DONE, -1);
   if (msg->status_code == STATUS_SUCCESS)
     return EXIT_SUCCESS;
   return EXIT_FAILURE;

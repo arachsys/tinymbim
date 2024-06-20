@@ -2,7 +2,9 @@
 
 case "$2" in
   start)
-    mbim "$1" open
+    until timeout 10 mbim "$1" open; do
+      [ $? -ne 124 ] && exit 1
+    done
     mbim "$1" subscriber >/dev/null
     mbim "$1" connect "${3:-internet}" "${@:4}" >/dev/null
     mbim "$1" config | while read -r KEY VALUE; do
@@ -31,7 +33,7 @@ case "$2" in
           ;;
       esac
     done
-    mbim "$1" close
+    timeout 1 mbim "$1" close
     ;;
 
   *)
