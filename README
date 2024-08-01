@@ -231,13 +231,17 @@ apply to the host-side network interface with 'mbim config'. For example:
   dns 10.206.128.1
   mtu 1500
 
-The interface key is deduced from sysfs, and is the network interface name
-corresponding to the given cdc-wdm device. It always appears before other
-keys to simplify scripts consuming the key-value output lines.
+The interface name is deduced from sysfs, and is the network interface
+corresponding to the given cdc-wdm or wwan device. It always appears
+before other keys to simplify scripts consuming the key-value output lines.
 
 The address, gateway and dns keys may be repeated to supply multiple IPv4 or
 IPv6 addresses, and the netmask is included in the case of the address key.
 Exactly one address is supplied per key.
+
+The interface name can also be obtained on its own with 'mbim interface'.
+Unlike 'mbim config', this also works without an open device or established
+connection and returns an error if no interface name could be found.
 
 
 Bringing up a network connection

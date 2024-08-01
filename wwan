@@ -28,7 +28,7 @@ case "$2" in
     ;;
 
   stop)
-    mbim "$1" config 2>/dev/null | while read -r KEY VALUE; do
+    mbim "$1" interface 2>/dev/null | while read -r KEY VALUE; do
       case "$KEY" in
         interface)
           ip address flush "$VALUE" scope global

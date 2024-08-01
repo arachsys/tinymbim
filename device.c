@@ -39,22 +39,25 @@ int device(const char *path) {
   return fd;
 }
 
-void interface(int fd) {
+int interface(int fd) {
   struct stat status;
   char *path = NULL;
+  size_t found = 0;
 
   if (fstat(fd, &status) < 0)
     err(EXIT_FAILURE, "fstat");
   if (!S_ISCHR(status.st_mode))
-    return;
+    return EXIT_FAILURE;
 
   if (asprintf(&path, "/sys/dev/char/%u:%u/device/net",
         major(status.st_rdev), minor(status.st_rdev)) >= 0) {
     struct dirent **list = NULL;
     ssize_t count = scandir(path, &list, NULL, alphasort);
     for (ssize_t i = 0; i < count; i++) {
-      if (list[i]->d_name[0] != '.')
+      if (list[i]->d_name[0] != '.') {
         printf("interface %s\n", list[i]->d_name);
+        found++;
+      }
       free(list[i]);
     }
     free(list);
@@ -66,13 +69,19 @@ void interface(int fd) {
     struct dirent **list = NULL;
     ssize_t count = scandir(path, &list, NULL, alphasort);
     for (ssize_t i = 0; i < count; i++) {
-      if (list[i]->d_name[0] != '.')
+      if (list[i]->d_name[0] != '.') {
         printf("interface %s\n", list[i]->d_name);
+        found++;
+      }
       free(list[i]);
     }
     free(list);
     free(path);
   }
+
+  if (found)
+    return EXIT_SUCCESS;
+  return EXIT_FAILURE;
 }
 
 void *receive(int fd, uint32_t type, uint32_t cid) {

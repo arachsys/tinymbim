@@ -17,10 +17,13 @@ int main(int argc, char **argv) {
       if (strcmp(argv[2], response_handlers[i].name) == 0)
         response = response_handlers[i].handler;
 
-    if (request && response) {
+    if (request || response) {
       int fd = device(argv[1]);
-      request(fd, argc - 3, argv + 3);
-      return response(fd);
+      if (request)
+        request(fd, argc - 3, argv + 3);
+      if (response)
+        return response(fd);
+      return EXIT_SUCCESS;
     }
   }
 
@@ -44,6 +47,7 @@ Commands:\n\
                     activate IP data session\n\
   disconnect        deactivate IP data session\n\
   config            query IP configuration for data session\n\
+  interface         query interface name for data session\n\
 ", argv[0]);
   return 64;
 }

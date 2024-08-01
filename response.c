@@ -407,6 +407,10 @@ static int response_config(int fd) {
   return EXIT_SUCCESS;
 }
 
+static int response_interface(int fd) {
+  return interface(fd);
+}
+
 struct response_handler response_handlers[] = {
   { "open", response_open },
   { "close", response_close },
@@ -423,5 +427,6 @@ struct response_handler response_handlers[] = {
   { "connect", response_connect },
   { "disconnect", response_disconnect },
   { "config", response_config },
+  { "interface", response_interface },
   { NULL, NULL }
 };
