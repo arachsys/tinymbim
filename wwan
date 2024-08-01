@@ -10,7 +10,9 @@ case "$2" in
     mbim "$1" config | while read -r KEY VALUE; do
       case "$KEY" in
         interface)
-          IF=$VALUE && ip address flush "$IF" && ip link set "$IF" up
+          IF=$VALUE
+          ip address flush "$IF" scope global
+          ip link set "$IF" up
           ;;
         address)
           [ -n "$IF" ] && ip address add "$VALUE" dev "$IF"
@@ -29,7 +31,8 @@ case "$2" in
     mbim "$1" config 2>/dev/null | while read -r KEY VALUE; do
       case "$KEY" in
         interface)
-          ip address flush "$VALUE" && ip link set "$VALUE" down
+          ip address flush "$VALUE" scope global
+          ip link set "$VALUE" down
           ;;
       esac
     done
